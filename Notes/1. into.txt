@@ -1,0 +1,7 @@
+****** SPARK COMPONENTS ******
+
+-- Following represents spark components on high level :
+
+1. Low level API : RDD (Resilient distributed data), Distributed variables.
+2. Structured API : DataFrames, DataSets, SQL [Built on the top of RDD]
+3. Libraries and Ecosystem : Structured streaming and advanced analytics [Built on the top of structured API]

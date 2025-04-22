@@ -1,0 +1,46 @@
+****** EXAMPLE ******
+
+-- There is a classroom with 8 students sitting as a couple.
+-- Teacher has 4 pouches full of marbles. And he wants to count the total no. of marbles.
+-- He distributes the pouches to 4 different students and ask them to count no of marbles from their individual
+   pouch.
+-- Student A counts the 25 marbles, B counts 5, F counts 10, D counts 10.
+-- Now the teacher told Student G to go and collect all the marbles and give it to himself.
+-- G collects the marble and tell teacher that there are 50 marbles.
+
+
+****** ANALYSIS OF EXAMPLE ******
+
+-- We did the count in two stages - 1. Local count, 2. Global count.
+-- And between those two stages, the 'shuffle' happened.
+-- The student G collected the data and written it down on a paper. So the data is persisted somewhere.
+-- Here, 
+    > our teacher is our 'Driver', 
+    > each couple of students is 'Executer', 
+    > and the count done by each individual is 'Task',
+    > The local and global counting are 'Two Stages',
+    > The counted data is persisted and shared to other executers. - 'Shuffle'
+
+-- Shuffle is the boundry that divides a job into stages.
+
+
+****** COMPONENTS OF SPARK ******
+
+1. Driver :
+
+> Heart of the spark application.
+> Manages the information and state of executers.
+> Analyzes, distributes and schedules the work on executers.
+
+2. Executer :
+
+> Execute the code.
+> Report the status of execution to driver.
+
+
+****** FEW POINTS TO REMEMBER ******
+
+-- Each task can work on only one partition of data at a time.
+-- Tasks can be executed in parallel.
+-- Executers are JVM processes running on cluster machines.
+-- Executers hosts cores and each core can 1 task at a time.
