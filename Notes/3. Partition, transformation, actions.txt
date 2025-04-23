@@ -1,0 +1,32 @@
+****** WHAT IS PARTITION ? ******
+
+-- To allow every executers to work in parallel, spark breaks dow the data into chunks called 'partition'.
+
+****** WHAT ARE TRANSFORMATIONS ? ******
+
+-- The instruction or code to modify and transform data is known as 'Transformation'.
+-- For example - select, where, groupby etc
+-- Transformation helps spark to build the logical plan.
+-- There are two types of Transformations :
+    1. Narrow Transformation
+    2. Wide Transformation
+
+>>>> See the image : G:\PySpark Tutorial\Notes\images\spark_transformations_example.jpg
+
+1. Narrow Transformation : After applying Transformation, each partition contributes to at-most one partition.
+2. Wide Transformation : After applying transformation, if one partition contributes to more than one partition.
+                         This type of transformation leads to data shuffle.
+
+>>>> See the image : G:\PySpark Tutorial\Notes\images\narrow_vs_wide_transformations.jpg
+
+****** WHAT ARE ACTIONS ? ******
+
+-- To trigger the execution, we need to call an Action.
+-- This basically executes the plan created by Transformation.
+-- Actions are of 3 types :
+
+    1. View data in console
+    2. Collect data to native languages
+    3. Write data to output data sources
+
+
