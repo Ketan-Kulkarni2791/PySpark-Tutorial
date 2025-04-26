@@ -1,6 +1,6 @@
 ****** WHAT IS PARTITION ? ******
 
--- To allow every executers to work in parallel, spark breaks dow the data into chunks called 'partition'.
+-- To allow every executers to work in parallel, spark breaks down the data into chunks called 'partition'.
 
 ****** WHAT ARE TRANSFORMATIONS ? ******
 
@@ -28,5 +28,19 @@
     1. View data in console
     2. Collect data to native languages
     3. Write data to output data sources
+
+****** SPARK PREFERS LAZY EVALUATION *****
+
+-- Spark will wait till last moment to execute the graph of computation.
+-- This allows spark to optimize, plan and use the resources properly for the exexution.
+
+
+****** WHAT IS SPARK SESSION ? ******
+
+-- Driver process is known as "Spark Session".
+-- It is the entry point for a spark execution.
+-- The Spark Session instance executes the code in the cluster.
+-- And the relation is one-to-one i.e. For one spark application we will have one spark
+   session instance.
 
 

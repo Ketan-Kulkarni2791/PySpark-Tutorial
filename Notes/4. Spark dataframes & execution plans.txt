@@ -1,0 +1,21 @@
+****** STRUCTURED API - DATAFRAMES ******
+
+-- Dataframes is the most common structured API, represented like a table.
+-- The table is represented in the form of rows and columns.
+-- DataFrame has a schema, which is the metadata for the columns i.e each column will 
+   have its own metadata.
+-- Data in DataFrames are stored in partitions.
+-- DataFrames are immutable.
+
+****** HOW SPARK EXECUTES A TRANSFORMATION ? ******
+
+>>>> See the image : G:\PySpark Tutorial\Notes\images\spark_execution_using_partiotion.jpg
+
+****** STRUCTURED API EXECUTION PLAN ******
+
+1. Logical Planning,
+2. Pysical Planning.
+
+>>>> See the image : G:\PySpark Tutorial\Notes\images\logical_planning.jpg
+
+>>>> See the image : G:\PySpark Tutorial\Notes\images\physical_plan.jpg
