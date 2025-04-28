@@ -1,0 +1,121 @@
+****** ENVIRONMENT SETUP ******
+
+-- One should have :
+
+1. Working AWS Account
+2. Install Docker in local machine
+3. Setup PySpark Jupyter Lab Environment in Docker
+
+-- Open the pyspark-jupyter-lab repo in cmd.
+-- Run folllowing commands :
+
+-- ### To build image from the Dockerfile:
+
+    > docker build --tag ketanpyspark/pyspark-jupyter-lab .
+
+-- ### To create container from image
+
+    > docker run -d -p 8888:8888 -p 4040:4040 --name jupyter-lab ketanpyspark/pyspark-jupyter-lab
+
+    Id created : 2fb47feb56857a2c97d374d77719399c610ff36fb6da50a5ac52454f042b57c8
+
+
+****** CREATING FIRST SPARK SESSION ******
+
+# spark session
+from pyspark.sql import SparkSession
+
+spark = (
+    SparkSession
+    .builder
+    .appName("Spark Introduction")  # name of our appication
+    .master("local[*]")   # master is where is going to be executed.
+    .getOrCreate() 
+)
+
+>> local[*] is to run Spark locally as many worker threads as logical cores on 
+   your machines.
+
+-- Then create the employee data :
+
+emp_data = [
+    ["001", "101", "Joe Goldberg", "30", "Male", "50000", "2015-01-01"],
+    ["002", "105", "Dwight Schrute", "40", "Male", "90000", "2015-08-11"],
+    ["003", "107", "Marianne Bellamy", "320", "Female", "10000", "2025-03-22"],
+    ["004", "102", "Monica Gellar", "26", "Female", "75000", "2017-09-21"],
+    ["005", "103", "Joey Tribianni", "32", "Male", "5000", "2017-10-18"],
+    ["006", "104", "Chandler Bing", "31", "Male", "100000", "2017-08-13"],
+    ["007", "105", "Ross Gellar", "30", "Male", "150000", "2017-06-26"],
+    ["008", "106", "Rachel Green", "29", "Female", "50000", "2017-08-21"],
+    ["009", "107", "Pheebi Buffay", "30", "Female", "10000", "2017-10-29"],
+    ["010", "101", "Peach Salinger", "32", "Female", "200000", "2019-01-20"],
+    ["011", "102", "Michael Scott", "40", "Male", "80000", "2011-11-10"],
+    ["012", "103", "Donald Draper", "35", "Male", "90000", "2014-12-23"],
+    ["013", "104", "Roger Sterling", "60", "Male", "300000", "2000-11-21"]
+]
+
+emp_schema = "employee_id string, department_id string, name string, age string, gender string, salary string, hire_date string"
+
+-- Then create emp DataFrame :
+
+# Create emp DataFrame
+
+emp = spark.createDataFrame(data=emp_data, schema=emp_schema)
+
+-- Check number of partitions :
+
+# Check number of partitions
+
+emp.rdd.getNumPartitions()          ---> 8
+
+-- Now let's see what is the data inside emp. That will be the ACTION. Remeber, 
+ACTIONS are respomsible to create jobs :
+
+# Show Data (ACTION)
+
+emp.show()
+
+|employee_id|department_id|            name|age|gender|salary| hire_date|
++-----------+-------------+----------------+---+------+------+----------+
+|        001|          101|    Joe Goldberg| 30|  Male| 50000|2015-01-01|
+|        002|          105|  Dwight Schrute| 40|  Male| 90000|2015-08-11|
+|        003|          107|Marianne Bellamy|320|Female| 10000|2025-03-22|
+|        004|          102|   Monica Gellar| 26|Female| 75000|2017-09-21|
+|        005|          103|  Joey Tribianni| 32|  Male|  5000|2017-10-18|
+|        006|          104|   Chandler Bing| 31|  Male|100000|2017-08-13|
+|        007|          105|     Ross Gellar| 30|  Male|150000|2017-06-26|
+|        008|          106|    Rachel Green| 29|Female| 50000|2017-08-21|
+|        009|          107|   Pheebi Buffay| 30|Female| 10000|2017-10-29|
+|        010|          101|  Peach Salinger| 32|Female|200000|2019-01-20|
+|        011|          102|   Michael Scott| 40|  Male| 80000|2011-11-10|
+|        012|          103|   Donald Draper| 35|  Male| 90000|2014-12-23|
+|        013|          104|  Roger Sterling| 60|  Male|300000|2000-11-21|
++-----------+-------------+----------------+---+------+------+----------+
+
+-- Let's write our first transformation i.e. emp salary > 100000 :
+
+# Our  first transformation (emp salary > 100000)
+
+emp_final = emp.where("salary>100000")
+
+# Validate the partitions
+
+emp_final.rdd.getNumPartitions()
+
+-- Now, unless we call an ACTION, nothing will happen. So create an ACTION :
+
+# Write data as CSV output (ACTION)
+
+emp_final.write.format("csv").save("data/output/1/emp.csv")
+
+****** BONUS TIP ******
+
+-- Since we have already created a spark session named - "spark" - Can we change it 
+   using the interactive spark shell ? YES.
+-- In jupyter notebook, open the interactive session :
+
+    > /bin/bash
+    > my_spark_session = spark.getActiveSession()
+
+
+
