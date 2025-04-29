@@ -1,0 +1,226 @@
+# spark session
+from pyspark.sql import SparkSession
+
+spark = (
+    SparkSession
+    .builder
+    .appName("Spark Introduction")  # name of our appication
+    .master("local[*]")   # master is where is going to be executed.
+    .getOrCreate() 
+)
+
+emp_data = [
+    ["001", "101", "Joe Goldberg", "30", "Male", "50000", "2015-01-01"],
+    ["002", "105", "Dwight Schrute", "40", "Male", "90000", "2015-08-11"],
+    ["003", "107", "Marianne Bellamy", "320", "Female", "10000", "2025-03-22"],
+    ["004", "102", "Monica Gellar", "26", "Female", "75000", "2017-09-21"],
+    ["005", "103", "Joey Tribianni", "32", "Male", "5000", "2017-10-18"],
+    ["006", "104", "Chandler Bing", "31", "Male", "100000", "2017-08-13"],
+    ["007", "105", "Ross Gellar", "30", "Male", "150000", "2017-06-26"],
+    ["008", "106", "Rachel Green", "29", "Female", "50000", "2017-08-21"],
+    ["009", "107", "Pheebi Buffay", "30", "Female", "10000", "2017-10-29"],
+    ["010", "101", "Peach Salinger", "32", "Female", "200000", "2019-01-20"],
+    ["011", "102", "Michael Scott", "40", "Male", "80000", "2011-11-10"],
+    ["012", "103", "Donald Draper", "35", "Male", "90000", "2014-12-23"],
+    ["013", "104", "Roger Sterling", "60", "Male", "300000", "2000-11-21"]
+]
+
+emp_schema = "employee_id string, department_id string, name string, age string, gender string, salary string, hire_date string"
+
+# Create emp DataFrame
+
+emp = spark.createDataFrame(data=emp_data, schema=emp_schema)
+
+# Show Data (ACTION)
+
+emp.show()
+
+-- Now let's validate the schema for the employee data.
+-- Schema is the metadata that defines the name and the type of the columns.
+
+# Schema for emp
+
+emp.printSchema()
+
+root
+ |-- employee_id: string (nullable = true)
+ |-- department_id: string (nullable = true)
+ |-- name: string (nullable = true)
+ |-- age: string (nullable = true)
+ |-- gender: string (nullable = true)
+ |-- salary: string (nullable = true)
+ |-- hire_date: string (nullable = true)
+
+-- There is one more way we can view the schema.
+
+# schema for emp
+
+emp.schema
+
+StructType([StructField('employee_id', StringType(), True), 
+StructField('department_id', StringType(), True), StructField('name', StringType(), 
+True), StructField('age', StringType(), True), StructField('gender', StringType(), 
+True), StructField('salary', StringType(), True), StructField('hire_date', 
+StringType(), True)])
+
+-- Here spark basically stores the schema in the form of StructType and StructField.
+
+# Small example for schema
+
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+
+schema_string = "name string, age int"
+
+schema_spark = StructType(
+    [
+        StructField("name", StringType(), True),
+        StructField("age", IntegerType(), True),
+    ]
+)
+
+-- DataFrame is divided intyo two parts - rows and columns.
+-- To manipulate a column, you need a DataFrame.
+-- There are many ways in which we can refer or create a column.
+
+# Columns and expressions
+
+from pyspark.sql.functions import col, expr
+
+col("name")
+expr("name")
+emp.salary
+emp["salary"]
+
+-- Now let's apply the transformation :
+
+# SELECT columns
+# select employee_id, name, age, salary from emp
+
+emp_filtered = emp.select(col("employee_id"), expr("name"), emp.age, emp.salary)
+
+-- Now let's call the show() ACTION.
+
+# SHOW DataFrame (ACTION)
+
+emp_filtered.show()
+
++-----------+----------------+---+------+
+|employee_id|            name|age|salary|
++-----------+----------------+---+------+
+|        001|    Joe Goldberg| 30| 50000|
+|        002|  Dwight Schrute| 40| 90000|
+|        003|Marianne Bellamy|320| 10000|
+|        004|   Monica Gellar| 26| 75000|
+|        005|  Joey Tribianni| 32|  5000|
+|        006|   Chandler Bing| 31|100000|
+|        007|     Ross Gellar| 30|150000|
+|        008|    Rachel Green| 29| 50000|
+|        009|   Pheebi Buffay| 30| 10000|
+|        010|  Peach Salinger| 32|200000|
+|        011|   Michael Scott| 40| 80000|
+|        012|   Donald Draper| 35| 90000|
+|        013|  Roger Sterling| 60|300000|
++-----------+----------------+---+------+
+
+# Using expr for select
+# select employee_id as emp_id, name, cast(age as int) as age, salary from emp_filtered
+
+emp_casted = emp_filtered.select(expr("employee_id as emp_id"), emp_filtered.name, 
+                                expr("cast(age as int) as age"), emp.salary)
+
+
+# SHOW DataFrame (ACTION)
+
+emp_casted.show()
+
++------+----------------+---+------+
+|emp_id|            name|age|salary|
++------+----------------+---+------+
+|   001|    Joe Goldberg| 30| 50000|
+|   002|  Dwight Schrute| 40| 90000|
+|   003|Marianne Bellamy|320| 10000|
+|   004|   Monica Gellar| 26| 75000|
+|   005|  Joey Tribianni| 32|  5000|
+|   006|   Chandler Bing| 31|100000|
+|   007|     Ross Gellar| 30|150000|
+|   008|    Rachel Green| 29| 50000|
+|   009|   Pheebi Buffay| 30| 10000|
+|   010|  Peach Salinger| 32|200000|
+|   011|   Michael Scott| 40| 80000|
+|   012|   Donald Draper| 35| 90000|
+|   013|  Roger Sterling| 60|300000|
++------+----------------+---+------+
+
+emp_casted.printSchema()
+
+root
+ |-- emp_id: string (nullable = true)
+ |-- name: string (nullable = true)
+ |-- age: integer (nullable = true)
+ |-- salary: string (nullable = true)
+
+-- Spark provide bettre way to use select and expr in one method - selectExpr
+
+emp_casted_1 = emp_filtered.selectExpr("employee_id as emp_ids", "name",
+                                      "cast(age as int) emp_age", "salary")
+emp_casted_1.show()
+
++-------+----------------+-------+------+
+|emp_ids|            name|emp_age|salary|
++-------+----------------+-------+------+
+|    001|    Joe Goldberg|     30| 50000|
+|    002|  Dwight Schrute|     40| 90000|
+|    003|Marianne Bellamy|    320| 10000|
+|    004|   Monica Gellar|     26| 75000|
+|    005|  Joey Tribianni|     32|  5000|
+|    006|   Chandler Bing|     31|100000|
+|    007|     Ross Gellar|     30|150000|
+|    008|    Rachel Green|     29| 50000|
+|    009|   Pheebi Buffay|     30| 10000|
+|    010|  Peach Salinger|     32|200000|
+|    011|   Michael Scott|     40| 80000|
+|    012|   Donald Draper|     35| 90000|
+|    013|  Roger Sterling|     60|300000|
++-------+----------------+-------+------+
+
+# Filter emp based on age
+# select emp_id, name age salary from emp_casted where age > 30
+
+emp_final = emp_casted.select("emp_id", "name", "age", "salary").where("age>30")
+emp_final.show()
+
++------+----------------+---+------+
+|emp_id|            name|age|salary|
++------+----------------+---+------+
+|   002|  Dwight Schrute| 40| 90000|
+|   003|Marianne Bellamy|320| 10000|
+|   005|  Joey Tribianni| 32|  5000|
+|   006|   Chandler Bing| 31|100000|
+|   010|  Peach Salinger| 32|200000|
+|   011|   Michael Scott| 40| 80000|
+|   012|   Donald Draper| 35| 90000|
+|   013|  Roger Sterling| 60|300000|
++------+----------------+---+------+
+
+# Write the data back as csv (ACTION)
+
+emp_final.write.format("csv").save("data/output/2/emp.csv")
+
+
+****** BONUS TIP ******
+
+# bonus tip
+
+from pyspark.sql.types import _parse_datatype_string
+
+schema_str = "name string, age int"
+
+schema_spark = _parse_datatype_string(schema_str)
+
+schema_spark
+
+StructType([StructField('name', StringType(), True), StructField('age', 
+           IntegerType(), True)])
+
+
+
