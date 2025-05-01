@@ -1,0 +1,79 @@
+# print schema
+
+emp.printSchema()
+
+root
+ |-- employee_id: string (nullable = true)
+ |-- department_id: string (nullable = true)
+ |-- name: string (nullable = true)
+ |-- age: string (nullable = true)
+ |-- gender: string (nullable = true)
+ |-- salary: string (nullable = true)
+ |-- hire_date: string (nullable = true)
+
+
+-- WHEN THEN ELSE :
+
+# CASE WHEN ELSE
+# select employee_id, name, age, salary, gender,
+# CASE 
+#   WHEN gender = 'Male' THEN 'M',
+#   WHEN gender = 'Female' THEN 'F'
+#   ELSE null
+# END AS new_gender,
+# hire_date from emp;
+
+from pyspark.sql.functions import when, col
+
+emp_gender_fixed = emp.withColumn("new_gender", when(col("gender") == 'Male', 'M')
+                                                .when(col("gender") == 'Female', 'F')
+                                                .otherwise(None)
+                                 )
+emp_gender_fixed.show()
+
++-----------+-------------+----------------+---+------+------+----------+----------+
+|employee_id|department_id|            name|age|gender|salary| hire_date|new_gender|
++-----------+-------------+----------------+---+------+------+----------+----------+
+|        001|          101|    Joe Goldberg| 30|  Male| 50000|2015-01-01|         M|
+|        002|          105|  Dwight Schrute| 40|  Male| 90000|2015-08-11|         M|
+|        003|          107|Marianne Bellamy|320|Female| 10000|2025-03-22|         F|
+|        004|          102|   Monica Gellar| 26|Female| 75000|2017-09-21|         F|
+|        005|          103|  Joey Tribianni| 32|  Male|  5000|2017-10-18|         M|
+|        006|          104|   Chandler Bing| 31|  Male|100000|2017-08-13|         M|
+|        007|          105|     Ross Gellar| 30|  Male|150000|2017-06-26|         M|
+|        008|          106|    Rachel Green| 29|Female| 50000|2017-08-21|         F|
+|        009|          107|   Pheebi Buffay| 30|Female| 10000|2017-10-29|         F|
+|        010|          101|  Peach Salinger| 32|Female|200000|2019-01-20|         F|
+|        011|          102|   Michael Scott| 40|  Male| 80000|2011-11-10|         M|
+|        012|          103|   Donald Draper| 35|  Male| 90000|2014-12-23|         M|
+|        013|          104|  Roger Sterling| 60|  Male|300000|2000-11-21|         M|
++-----------+-------------+----------------+---+------+------+----------+----------+
+
+-- Replace String:
+
+# Replace in strings
+# select employee_id, name, replace("name", "J", "Z") as new_name from emp_gender_fixed;
+
+from pyspark.sql.functions import regexp_replace
+
+emp_name_fixed = emp_gender_fixed.withColumn("new_name", regexp_replace(col("name"), "J", "Z"))
+emp_name_fixed.select("employee_id", "name", "new_name").show()
+
++-----------+----------------+----------------+
+|employee_id|            name|        new_name|
++-----------+----------------+----------------+
+|        001|    Joe Goldberg|    Zoe Goldberg|
+|        002|  Dwight Schrute|  Dwight Schrute|
+|        003|Marianne Bellamy|Marianne Bellamy|
+|        004|   Monica Gellar|   Monica Gellar|
+|        005|  Joey Tribianni|  Zoey Tribianni|
+|        006|   Chandler Bing|   Chandler Bing|
+|        007|     Ross Gellar|     Ross Gellar|
+|        008|    Rachel Green|    Rachel Green|
+|        009|   Pheebi Buffay|   Pheebi Buffay|
+|        010|  Peach Salinger|  Peach Salinger|
+|        011|   Michael Scott|   Michael Scott|
+|        012|   Donald Draper|   Donald Draper|
+|        013|  Roger Sterling|  Roger Sterling|
++-----------+----------------+----------------+
+
